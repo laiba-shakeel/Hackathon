@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import {
   Image,
   Text,
@@ -22,18 +22,36 @@ import OrSeparator from '../../Components/OrSeparator';
 import auth from '@react-native-firebase/auth';
 import welcomeStyle from './WelcomeStyle';
 import HeaderSection from '../../Components/Header/Header';
+import { login as LoginAPI } from '../../apis';
+import { storage, useAuth } from '../../storage';
 const Login = () => {
   const navigation = useNavigation();
   const [visiblePass, setVisiblePass] = useState(false);
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+
   const HandleLogin = () => {
     navigation.navigate('SignIn');
   };
 
-  const handleLogin = () => {
-    navigation.replace('Home')
+  const { login } = useAuth();
+
+  const handleLogin = async () => {
+    if (email === '' || password === '') {
+      alert('Email and Password cannot be empty')
+      return
+    }
+
+    try {
+      let data = await LoginAPI(email, password)
+      login(JSON.stringify(data))
+      navigation.navigate('Home')
+    } catch (error) {
+      alert('Invalid Email or Password')
+    }
+
   };
+
   return (
     <View style={styles.container}>
       <KeyboardAvoidingView behavior={Platform.OS == 'ios' ? 'position' : ''}>

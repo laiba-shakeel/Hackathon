@@ -1,10 +1,11 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import {
   Image,
   ImageBackground,
   Pressable,
   ScrollView,
   Text,
+  Touchable,
   TouchableOpacity,
   View,
 } from 'react-native';
@@ -18,10 +19,11 @@ import seventyPercentImage from '../../Assets/seventy.png';
 import eightyPercentImage from '../../Assets/eighty.png';
 import CategoryImage from '../../Assets/Category.png';
 import NotificationImage from '../../Assets/Notifications.png';
-import {useNavigation} from '@react-navigation/native';
-import {SvgXml} from 'react-native-svg';
+import { useNavigation } from '@react-navigation/native';
+import { SvgXml } from 'react-native-svg';
 import SvgIcons from '../../Assets/svg';
 import color from '../../constant/color';
+import { getProjects, getTasks } from '../../apis';
 const Home = () => {
   const navigation = useNavigation();
 
@@ -33,44 +35,20 @@ const Home = () => {
     console.log('navigate');
   };
 
-  const data = [
-    {
-      title: 'Productivity Mobile App',
-      task: 'Create Detail Booking',
-      time: '2 min',
-      progressImage: sixtyPercentImage,
-    },
-    {
-      title: 'Banking Mobile App',
-      task: 'Revision Home Page',
-      time: '5 min',
-      progressImage: seventyPercentImage,
-    },
-    {
-      title: 'Online Course',
-      task: 'Working On Landing Page',
-      time: '7 min',
-      progressImage: eightyPercentImage,
-    },
-    {
-      title: 'Productivity Mobile App',
-      task: 'Create Detail Booking',
-      time: '2 min',
-      progressImage: sixtyPercentImage,
-    },
-    {
-      title: 'Banking Mobile App',
-      task: 'Revision Home Page',
-      time: '5 min',
-      progressImage: seventyPercentImage,
-    },
-    {
-      title: 'Online Course',
-      task: 'Working On Landing Page',
-      time: '7 min',
-      progressImage: eightyPercentImage,
-    },
-  ];
+  const [data, setData] = useState([]);
+  const [project, setProject] = useState([]);
+
+  useEffect(() => {
+
+    getProjects().then((res) => {
+      console.log(res.data);
+      setProject(res.data);
+    });
+
+    getTasks().then((res) => {
+      setData(res.data);
+    })
+  }, []);
 
   return (
     <View style={styles.container}>
@@ -93,43 +71,32 @@ const Home = () => {
         </ImageBackground>
       </View>
       <View style={styles.SectionMainContainer}>
-        <ScrollView horizontal style={{paddingHorizontal: 10}}>
-          <UserCard
-            borderColor="white"
-            mainTextColor="white"
-            uiDesignKit="#C5DAFD"
-            progress="#ffffff"
-          />
-          <UserCard
-            bgcolor="white"
-            borderColor="#000000"
-            mainTextColor="black"
-            uiDesignKit="gray"
-            progress="2d2d2d"
-          />
-          <UserCard
-            borderColor="white"
-            mainTextColor="white"
-            uiDesignKit="#C5DAFD"
-            progress="#ffffff"
-          />
-          <UserCard
-            bgcolor="white"
-            borderColor="#000000"
-            mainTextColor="black"
-            uiDesignKit="gray"
-            progress="2d2d2d"
-          />
+        <ScrollView horizontal style={{ paddingHorizontal: 10 }}>
+          {project?.map((item, index) => (
+            <UserCard
+              key={index}
+              borderColor="white"
+              mainTextColor="white"
+              uiDesignKit="#C5DAFD"
+              progress="#ffffff"
+              name={item.name}
+              description={item.description}
+            />
+          ))}
+
         </ScrollView>
       </View>
-      <View
+      <TouchableOpacity
+        onPress={() => {
+          navigation.navigate('TaskScreen');
+        }}
         style={{
           flexDirection: 'row',
           justifyContent: 'space-between',
           alignItems: 'center',
           paddingHorizontal: 5,
           marginTop: 15,
-          paddingVertical:10
+          paddingVertical: 10
         }}>
         <Text
           style={{
@@ -140,33 +107,27 @@ const Home = () => {
           }}>
           In Progress
         </Text>
-        <TouchableOpacity
-          onPress={() => {
-            navigation.navigate('TaskScreen');
-          }}>
+        <View>
           <SvgXml xml={SvgIcons.rightArrow} />
-        </TouchableOpacity>
-      </View>
+        </View>
+      </TouchableOpacity>
       <View style={{ flex: 1, marginTop: 1, paddingBottom: 1 }}>
-      <ScrollView
-        showsVerticalScrollIndicator
-        style={{ paddingVertical: 10, marginVertical: 10 }}
-      >
-        {data.map((item, index) => (
-          <TouchableOpacity
-            key={index}
-            onPress={() => navigation.navigate('ProgressScreen')}
-          >
-            <ListCard
-              title={item.title}
-              task={item.task}
-              time={item.time}
-              progressImage={item.progressImage}
-            />
-          </TouchableOpacity>
-        ))}
-      </ScrollView>
-    </View>
+        <ScrollView
+          showsVerticalScrollIndicator
+          style={{ paddingVertical: 10, marginVertical: 10 }}
+        >
+          {data.map((item, index) => (
+            <TouchableOpacity
+              key={index}
+              onPress={() => navigation.navigate('ProgressScreen')}
+            >
+              <ListCard
+                task={item}
+              />
+            </TouchableOpacity>
+          ))}
+        </ScrollView>
+      </View>
     </View>
   );
 };

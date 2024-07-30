@@ -8,6 +8,8 @@ const UserCard = ({
   mainTextColor,
   uiDesignKit,
   progress,
+  name,
+  description
 }) => {
   return (
     <View
@@ -30,7 +32,7 @@ const UserCard = ({
           lineHeight: 18,
           color: mainTextColor,
         }}>
-        Application Design
+        {name}
       </Text>
       <Text
         style={{
@@ -41,7 +43,7 @@ const UserCard = ({
           lineHeight: 12,
           paddingTop: 5,
         }}>
-        UI Design Kit
+        {description}
       </Text>
       <View
         style={{

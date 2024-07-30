@@ -1,4 +1,4 @@
-import React, {useState} from 'react';
+import React, { useState } from 'react';
 import {
   Image,
   Text,
@@ -12,30 +12,48 @@ import {
 } from 'react-native';
 import googleIcon from '../../Assets/google.png';
 import appleIcon from '../../Assets/path4.png';
-import {useNavigation} from '@react-navigation/native';
+import { useNavigation } from '@react-navigation/native';
 import color from '../../constant/color';
 import InputBox from '../../Components/TextInput/index';
 import images from '../../Assets';
 import scale from '../../constant/scale';
 import SvgIcons from '../../Assets/svg';
-import {SvgXml} from 'react-native-svg';
+import { SvgXml } from 'react-native-svg';
 import OrSeparator from '../../Components/OrSeparator';
 import auth from '@react-native-firebase/auth';
 import welcomeStyle from './WelcomeStyle';
 import HeaderSection from '../../Components/Header/Header';
+import { register } from '../../apis';
+import { useAuth } from '../../storage';
 const SignIn = () => {
   const navigation = useNavigation();
   const [visiblePass, setVisiblePass] = useState(false);
   const [email, setEmail] = useState('');
-  const [name , setName] = useState('')
+  const [name, setName] = useState('')
   const [password, setPassword] = useState('');
+
   const HandleLogin = () => {
     navigation.navigate('Home');
   };
 
-  const handleLogin = () => {
-    navigation.navigate('Home');
+  let { login } = useAuth();
+
+  const handleLogin = async () => {
+    if (email === '' || password === '') {
+      alert('Email and Password cannot be empty');
+      return;
+    }
+
+    try {
+      let res = await register(name, email, password);
+      login(JSON.stringify(res.data));
+      navigation.navigate('Home');
+    } catch (error) {
+      console.error(error);
+      alert('Registration Failed');
+    }
   };
+
   return (
     <ScrollView style={styles.container}>
       <KeyboardAvoidingView behavior={Platform.OS == 'ios' ? 'position' : ''}>
@@ -54,29 +72,29 @@ const SignIn = () => {
               containerStyle={{
                 color: '#5b6b79',
               }}
-              textStyle={{color: '#756EF3'}}
+              textStyle={{ color: '#756EF3' }}
               placeholder="Albert Einestine"
               type="email"
               value={name}
               onChangeText={text => setName(text)}
             />
           </View>
-          <View style={{paddingTop: 5}}>
+          <View style={{ paddingTop: 5 }}>
             <InputBox
               containerStyle={{
                 color: '#5b6b79',
               }}
-              textStyle={{color: '#756EF3'}}
+              textStyle={{ color: '#756EF3' }}
               placeholder="albart.einestine@gmail.com"
               type="email"
               value={email}
               onChangeText={text => setEmail(text)}
             />
           </View>
-          <View style={{paddingTop: 5}}>
+          <View style={{ paddingTop: 5 }}>
             <InputBox
-              containerStyle={{color: '#5b6b79'}}
-              textStyle={{color: '#5b6b79'}}
+              containerStyle={{ color: '#5b6b79' }}
+              textStyle={{ color: '#5b6b79' }}
               secureTextEntry={!visiblePass}
               placeholder="Enter Your Password"
               type="password"
@@ -157,7 +175,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: scale(25),
     backgroundColor: color.WHITE,
     paddingTop: scale(16),
-    paddingBottom:35
+    paddingBottom: 35
   },
   img: {
     width: 100,
@@ -165,8 +183,8 @@ const styles = StyleSheet.create({
   },
   space: {
     color: color.TextColor,
-    fontWeight:'700',
-    textAlign:'center',
+    fontWeight: '700',
+    textAlign: 'center',
   },
   SocialAppDiv: {
     // borderWidth: 1,
@@ -190,7 +208,7 @@ const styles = StyleSheet.create({
   footer: {
     // borderWidth: 1,
     marginVertical: 5,
-    paddingBottom:20
+    paddingBottom: 20
   },
   img: {
     width: 25,
