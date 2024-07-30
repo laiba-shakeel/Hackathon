@@ -6,17 +6,6 @@ import bcrypt from "bcrypt"
 import UserSchema from "../models/UserSchema.js";
 
 const UserRegister = async(req,res)=>{
-    const validationErr = validationResult(req);
-    if (!validationErr.isEmpty()) {
-      return res.status(StatusCode.VALIDATION_ERROR).json(
-        jsonnGenerate(
-          StatusCode.VALIDATION_ERROR,
-          "Validation error",
-          validationErr.mapped()
-        )
-      );
-    }
-  
     // Destructuring
     const { name, email, password } = req.body;
   

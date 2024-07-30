@@ -1,5 +1,5 @@
 import { validationResult } from "express-validator";
-import  {jsonnGenerate } from "../utils/helper.js";
+import { jsonnGenerate } from "../utils/helper.js";
 import { StatusCode } from "../utils/constant.js"; // Ensure the path is correct
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
@@ -11,8 +11,8 @@ dotenv.config({ path: "../.env" });
 const LoginUser = async (req, res) => {
   const errors = validationResult(req);
   if (!errors.isEmpty()) {
-    return res.status(StatusCode.VALIDATION_ERROR).json(
-      jsonnGenerate(StatusCode.VALIDATION_ERROR, "Validation error", errors.mapped())
+    return res.status(StatusCode.UNAUTHORIZED).json(
+      jsonnGenerate(StatusCode.UNAUTHORIZED, "Validation error", errors.mapped())
     );
   }
 
@@ -22,16 +22,16 @@ const LoginUser = async (req, res) => {
     // Check if user exists
     const user = await UserSchema.findOne({ email: email });
     if (!user) {
-      return res.status(StatusCode.UNPROCESSABLE_ENTITY).json(
-        jsonnGenerate(StatusCode.UNPROCESSABLE_ENTITY, "Email and password are incorrect")
+      return res.status(StatusCode.UNAUTHORIZED).json(
+        jsonnGenerate(StatusCode.UNAUTHORIZED, "Email and password are incorrect")
       );
     }
 
     // Verify password
     const verification = await bcrypt.compare(password, user.password);
     if (!verification) {
-      return res.status(StatusCode.UNPROCESSABLE_ENTITY).json(
-        jsonnGenerate(StatusCode.UNPROCESSABLE_ENTITY, "Email and password are incorrect")
+      return res.status(StatusCode.UNAUTHORIZED).json(
+        jsonnGenerate(StatusCode.UNAUTHORIZED, "Email and password are incorrect")
       );
     }
 
@@ -44,9 +44,7 @@ const LoginUser = async (req, res) => {
       { expiresIn: '1h' } // Optional: token expiry time
     );
 
-    return res.status(StatusCode.SUCCESS).json(
-      jsonnGenerate(StatusCode.SUCCESS, "Login successful", { userId: user._id, token: token })
-    );
+    return res.status(StatusCode.SUCCESS).json({ userId: user._id, token: token, name: user.name, email: user.email });
   } catch (err) {
     console.error(err);
     return res.status(StatusCode.INTERNAL_SERVER_ERROR).json(

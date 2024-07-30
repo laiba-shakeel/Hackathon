@@ -1,4 +1,4 @@
-import React, {useState} from 'react';
+import React, {useEffect, useState} from 'react';
 import {
   View,
   Text,
@@ -18,6 +18,7 @@ import edit from '../../Assets/edit.png';
 import calendarIcon from '../../Assets/calender.jpg'; // Add your calendar icon here
 import TaskCard from '../../Components/Card/TaskCard'; // Assuming TaskCard is a separate component
 import color from '../../constant/color';
+import { getTasks } from '../../apis';
 
 const TaskScreen = () => {
   const [selectedDate, setSelectedDate] = useState('2024-07-09');
@@ -37,38 +38,14 @@ const TaskScreen = () => {
     navigation.goBack('');
   };
 
-  const tasks = [
-    {
-      time: '10:00am - 11:00am',
-      title: 'Wireframe elements',
-      color: '#5DBCD2',
-      people: ['👤', '👤'],
-    },
-    {
-      time: '11:40am - 12:40pm',
-      title: 'Mobile app Design',
-      color: '#A3D57F',
-      people: ['👤', '👤', '👤'],
-    },
-    {
-      time: '01:20pm - 02:30pm',
-      title: 'Design Team call',
-      color: '#F2B36F',
-      people: ['👤', '👤', '👤', '👤', '👤'],
-    },
-    {
-      time: '03:00pm - 04:00pm',
-      title: 'Client Meeting',
-      color: '#FF9A9E',
-      people: ['👤', '👤'],
-    },
-    {
-      time: '04:30pm - 05:30pm',
-      title: 'Code Review',
-      color: '#D5B8FF',
-      people: ['👤', '👤', '👤'],
-    },
-  ];
+  const [tasks, setTasks] = useState([]);
+
+  useEffect(() => {
+    getTasks().then((res) => {
+      console.log(res.data);
+      setTasks(res.data);
+    });
+  }, []);
 
   return (
     <ScrollView>
